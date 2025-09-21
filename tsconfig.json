@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "lib": ["es6", "dom"],
+    "module": "commonjs",
+    "target": "es6",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "declaration": false,
+    "sourceMap": false,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
+    "typeRoots": ["./node_modules/@types", "."],
+    "types": ["node", "mocha", "chai"]
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.js",
+    "global.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "target",
+    "dist"
+  ]
+}
