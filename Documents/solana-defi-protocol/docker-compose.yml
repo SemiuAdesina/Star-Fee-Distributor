@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  validator:
+    image: solanalabs/solana:v1.18.18
+    command: >
+      solana-test-validator
+      --reset
+      --limit-ledger-size
+      --faucet-port 9900
+      --rpc-port 8899
+      --dynamic-port-range 8000-8020
+    ports:
+      - "8899:8899"
+      - "9900:9900"
+    volumes:
+      - validator-ledger:/ledger
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - SOLANA_RPC_URL=http://validator:8899
+    depends_on:
+      - validator
+    ports:
+      - "4000:4000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      - NEXT_PUBLIC_SOLANA_RPC=http://localhost:8899
+      - BACKEND_URL=http://backend:4000
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  validator-ledger:
+

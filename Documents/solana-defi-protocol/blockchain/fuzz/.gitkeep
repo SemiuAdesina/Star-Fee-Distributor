@@ -1,0 +1,3 @@
+# Fuzz testing directory
+# Place fuzz test targets here using cargo-fuzz or similar tools
+

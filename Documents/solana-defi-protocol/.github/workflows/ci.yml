@@ -1,0 +1,195 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  audit-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.79.0
+          components: clippy
+      - name: Install pnpm
+        run: corepack enable
+      - name: Backend install
+        working-directory: backend
+        run: pnpm install
+      - name: Frontend install
+        working-directory: frontend
+        run: pnpm install
+      - name: Cargo audit
+        working-directory: blockchain
+        run: cargo audit
+      - name: npm audit backend
+        working-directory: backend
+        run: pnpm audit --audit-level=high
+      - name: npm audit frontend
+        working-directory: frontend
+        run: pnpm audit --audit-level=high
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.79.0
+          components: clippy, rustfmt
+      - name: Install pnpm
+        run: corepack enable
+      - name: Backend lint
+        working-directory: backend
+        run: |
+          pnpm install
+          pnpm lint
+      - name: Frontend lint
+        working-directory: frontend
+        run: |
+          pnpm install
+          pnpm lint
+      - name: Blockchain clippy
+        working-directory: blockchain
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Blockchain fmt
+        working-directory: blockchain
+        run: cargo fmt -- --check
+      - name: Solana program static analysis
+        working-directory: blockchain
+        run: |
+          cargo install cargo-audit --locked
+          cargo clippy --all-targets --all-features -- -D warnings -W clippy::arithmetic_side_effects -W clippy::unwrap_used
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.79.0
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+      - name: Install Anchor CLI
+        run: |
+          cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
+          avm install 0.30.1
+          avm use 0.30.1
+          echo "$HOME/.avm/bin" >> $GITHUB_PATH
+      - name: Install pnpm
+        run: corepack enable
+      - name: Backend test
+        working-directory: backend
+        run: |
+          pnpm install
+          pnpm test -- --runInBand
+      - name: Frontend test
+        working-directory: frontend
+        run: |
+          pnpm install
+          pnpm test -- --runInBand
+      - name: Anchor test
+        working-directory: blockchain
+        run: anchor test -- --nocapture
+      - name: Generate coverage report
+        working-directory: blockchain
+        run: |
+          cargo install cargo-llvm-cov --locked
+          cargo llvm-cov --locked --all-features --workspace --lcov --output-path lcov.info
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./blockchain/lcov.info
+          flags: blockchain
+          name: blockchain-coverage
+          fail_ci_if_error: false
+      - name: Check coverage threshold
+        working-directory: blockchain
+        run: |
+          coverage=$(cargo llvm-cov --locked --all-features --workspace --summary-only | grep -oP 'Total.*\K\d+\.\d+' | head -1 || echo "0")
+          echo "Coverage: ${coverage}%"
+          if (( $(echo "$coverage < 80" | bc -l) )); then
+            echo "ERROR: Coverage ${coverage}% is below 80% threshold"
+            exit 1
+          fi
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.79.0
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+      - name: Install Anchor CLI
+        run: |
+          cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
+          avm install 0.30.1
+          avm use 0.30.1
+          echo "$HOME/.avm/bin" >> $GITHUB_PATH
+      - name: Install pnpm
+        run: corepack enable
+      - name: Backend build
+        working-directory: backend
+        run: |
+          pnpm install
+          pnpm build
+      - name: Frontend build
+        working-directory: frontend
+        run: |
+          pnpm install
+          pnpm build
+      - name: Blockchain release build
+        working-directory: blockchain
+        run: cargo build --release
+      - name: Notify CI status webhook
+        if: always()
+        env:
+          API_KEY: ${{ secrets.CI_WEBHOOK_API_KEY }}
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            status="success"
+          else
+            status="failed"
+          fi
+          BACKEND_URL_FINAL="${BACKEND_URL:-http://localhost:4000}"
+          if [ -n "${API_KEY}" ]; then
+            curl -X POST "${BACKEND_URL_FINAL}/ci/status/webhook" \
+              -H "Content-Type: application/json" \
+              -H "x-api-key: ${API_KEY}" \
+              -d "{
+                \"pipeline\": \"github-actions-build\",
+                \"status\": \"${status}\",
+                \"commit\": \"${{ github.sha }}\",
+                \"runId\": \"run-${{ github.run_id }}\",
+                \"triggeredBy\": \"${{ github.actor }}\"
+              }" || echo "Webhook notification failed (non-blocking)"
+          else
+            echo "Skipping webhook: CI_WEBHOOK_API_KEY secret not set"
+          fi
+

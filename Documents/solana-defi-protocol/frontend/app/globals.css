@@ -1,0 +1,74 @@
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  width: 100% !important;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  width: 100% !important;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #000000;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#__next {
+  width: 100% !important;
+  min-height: 100vh;
+  display: block;
+}
+
+/* Force full width on all wrapper divs */
+body > div,
+body > div > div,
+body > div > div > div {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Override any wallet adapter styles that might constrain layout */
+.wallet-adapter-modal-wrapper,
+.wallet-adapter-modal {
+  width: auto !important;
+  max-width: none !important;
+}
+
+/* Ensure main content containers are full width */
+main {
+  width: 100% !important;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}

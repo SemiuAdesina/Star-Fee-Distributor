@@ -1,0 +1,15 @@
+{
+  "extends": "../frontend/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./tests",
+    "outDir": "./dist-tests",
+    "types": [
+      "mocha"
+    ],
+    "noEmit": true
+  },
+  "include": [
+    "tests/**/*.ts"
+  ]
+}
+

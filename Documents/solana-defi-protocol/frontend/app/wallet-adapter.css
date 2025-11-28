@@ -1,0 +1,214 @@
+/* Wallet Adapter Styling - Pure CSS, No Tailwind */
+
+/* Modal Wrapper - Backdrop */
+.wallet-adapter-modal-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Modal Container */
+.wallet-adapter-modal {
+  position: relative;
+  background: linear-gradient(to bottom right, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(147, 51, 234, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 0;
+  max-width: 400px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.wallet-adapter-modal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(147, 51, 234, 0.1), rgba(59, 130, 246, 0.1));
+  pointer-events: none;
+  border-radius: 24px;
+  z-index: 0;
+}
+
+/* Modal Title */
+.wallet-adapter-modal-title {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  padding: 24px 24px 16px 24px;
+  margin: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+/* Modal List */
+.wallet-adapter-modal-list {
+  margin: 0;
+  padding: 16px;
+  list-style: none;
+  position: relative;
+  z-index: 1;
+}
+
+.wallet-adapter-modal-list-item {
+  margin: 0 0 8px 0;
+  padding: 0;
+}
+
+.wallet-adapter-modal-list-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Wallet Buttons in Modal */
+.wallet-adapter-button {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.wallet-adapter-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(147, 51, 234, 0.1), rgba(59, 130, 246, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.wallet-adapter-button:hover {
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(147, 51, 234, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -5px rgba(147, 51, 234, 0.3);
+}
+
+.wallet-adapter-button:hover::before {
+  opacity: 1;
+}
+
+.wallet-adapter-button:active {
+  transform: translateY(0);
+}
+
+.wallet-adapter-button-start-icon,
+.wallet-adapter-button-end-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+/* Close Button */
+.wallet-adapter-modal-button-close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.wallet-adapter-modal-button-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.wallet-adapter-modal-button-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Wallet Button Trigger - The button that opens the modal */
+.wallet-adapter-button-trigger {
+  background: rgba(147, 51, 234, 0.2);
+  border: 1px solid rgba(147, 51, 234, 0.3);
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: #c084fc;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 100;
+  pointer-events: auto;
+  display: inline-block;
+}
+
+.wallet-adapter-button-trigger:hover {
+  background: rgba(147, 51, 234, 0.3);
+  border-color: rgba(196, 181, 253, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+}
+
+.wallet-adapter-button-trigger:active {
+  transform: translateY(0);
+}
+
+/* Ensure all nested elements are clickable */
+.wallet-adapter-button-trigger * {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Target button element specifically */
+.wallet-adapter-button-trigger button,
+button.wallet-adapter-button-trigger {
+  background: rgba(147, 51, 234, 0.2);
+  border: 1px solid rgba(147, 51, 234, 0.3);
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: #c084fc;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  z-index: 100;
+}
+
+.wallet-adapter-button-trigger button:hover,
+button.wallet-adapter-button-trigger:hover {
+  background: rgba(147, 51, 234, 0.3);
+  border-color: rgba(196, 181, 253, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+}
+

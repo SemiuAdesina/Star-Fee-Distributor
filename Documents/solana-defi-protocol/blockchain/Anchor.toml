@@ -1,0 +1,13 @@
+[programs.localnet]
+audit_registry = "DZejfnpxWTyfX6XziQoCHUJgvksMhVPzDRnY9Gj3FTgt"
+
+[registry]
+url = "https://anchor.projectserum.com"
+
+[provider]
+cluster = "Localnet"
+wallet = "~/.config/solana/id.json"
+
+[test]
+startup_wait = 15000
+
